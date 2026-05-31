@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Toko kue online untuk pre-order bolen, brownies, cake, dan hampers.">
+    <title>Wisma Kue Chelsea</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="preload" href="assets/bakery-hero.png" as="image">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="announcement-bar" id="announcement-bar">
+      <span id="announcement-text">Promo Spesial: Dapatkan diskon 10% dengan kode promo MAMA10!</span>
+    </div>
+    <header class="site-header">
+      <a class="brand" href="#home" aria-label="Wisma Kue Chelsea">
+        <span class="brand-mark">C</span>
+        <span>Wisma Kue Chelsea</span>
+      </a>
+      <nav class="main-nav" aria-label="Navigasi utama">
+        <a href="#produk">Produk</a>
+        <a href="#favorit">Favorit</a>
+        <a href="#ulasan-pelanggan">Testimoni</a>
+        <a href="#lokasi">Lokasi</a>
+      </nav>
+      <button class="cart-button" id="open-cart" type="button" aria-label="Buka keranjang">
+        <span>Cart</span>
+        <svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6.5 6h14l-1.6 8.1a2 2 0 0 1-2 1.6H9.2a2 2 0 0 1-2-1.6L5.7 3.8H3.5"/>
+          <path d="M9.4 20.2h.1M17 20.2h.1"/>
+        </svg>
+        <span class="cart-count" id="cart-count">0</span>
+      </button>
+    </header>
+
+    <main>
+      <section class="hero" id="home">
+        <img class="hero-image" src="assets/bakery-hero.png" alt="Display kue, pastry, dan gift box bakery">
+        <div class="hero-shade"></div>
+        <div class="hero-content">
+          <p class="eyebrow">Fresh baked daily</p>
+          <h1>Wisma Kue Chelsea</h1>
+          <p class="hero-copy">Bolen, brownies, cake ulang tahun, dan hampers premium siap pesan untuk keluarga, kantor, dan kiriman spesial.</p>
+          <div class="hero-actions">
+            <a class="primary-link" href="#produk">Belanja sekarang</a>
+            <a class="secondary-link" href="#lokasi">Lihat toko</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="quick-info" aria-label="Keunggulan toko">
+        <article>
+          <span>01</span>
+          <strong>Pre-order fleksibel</strong>
+          <p>Ambil di toko atau kirim lewat kurir lokal.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <strong>Packaging rapi</strong>
+          <p>Cocok untuk hampers, meeting, dan acara keluarga.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <strong>Checkout fleksibel</strong>
+          <p>Pilih delivery atau pick up langsung di toko.</p>
+        </article>
+      </section>
+
+      <section class="section" id="produk">
+        <div class="section-heading">
+          <p class="eyebrow">Katalog</p>
+          <h2>Pilih kue favorit</h2>
+        </div>
+        <div class="search-container">
+          <svg class="search-icon-svg" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM21 21l-4.35-4.35" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input type="text" id="product-search-input" placeholder="Cari kue lezat kesukaanmu..." aria-label="Cari Kue">
+        </div>
+        <div class="toolbar" role="toolbar" aria-label="Filter produk">
+          <button class="filter-button active" type="button" data-filter="all">Semua</button>
+          <button class="filter-button" type="button" data-filter="pastry">Pastry</button>
+          <button class="filter-button" type="button" data-filter="cake">Cake</button>
+          <button class="filter-button" type="button" data-filter="hampers">Hampers</button>
+        </div>
+        <div class="product-grid" id="product-grid" aria-live="polite"></div>
+      </section>
+
+      <section class="feature-band" id="favorit">
+        <div>
+          <p class="eyebrow">Best seller</p>
+          <h2>Bolen pisang keju</h2>
+          <p>Lapisan pastry renyah, isian pisang legit, dan keju gurih. Aman buat oleh-oleh karena dikemas dalam box tebal.</p>
+        </div>
+        <button class="primary-link feature-add" type="button" data-feature-add="bolen-pisang-keju">Tambah ke cart</button>
+      </section>
+
+      <section class="section reviews-section" id="ulasan-pelanggan">
+        <div class="section-heading">
+          <p class="eyebrow">Testimoni</p>
+          <h2>Apa kata mereka tentang Wisma Kue Chelsea?</h2>
+        </div>
+        
+        <div class="reviews-container">
+          <div class="reviews-list" id="customer-reviews-list">
+            <!-- Diisi secara dinamis oleh JS -->
+          </div>
+          
+          <div class="review-form-card">
+            <h3>Bagikan Pengalaman Anda</h3>
+            <p>Pernah membeli kue di sini? Berikan ulasan jujur Anda untuk membantu meningkatkan pelayanan kami!</p>
+            <form id="add-review-form">
+              <label>
+                Nama Anda
+                <input type="text" id="review-author" placeholder="Contoh: Chelsea Olivia" required>
+              </label>
+              
+              <div class="rating-input-group">
+                <span>Rating Bintang:</span>
+                <div class="star-rating-input">
+                  <input type="radio" id="star5" name="review-rating" value="5" checked><label for="star5" title="5 Bintang">&#9733;</label>
+                  <input type="radio" id="star4" name="review-rating" value="4"><label for="star4" title="4 Bintang">&#9733;</label>
+                  <input type="radio" id="star3" name="review-rating" value="3"><label for="star3" title="3 Bintang">&#9733;</label>
+                  <input type="radio" id="star2" name="review-rating" value="2"><label for="star2" title="2 Bintang">&#9733;</label>
+                  <input type="radio" id="star1" name="review-rating" value="1"><label for="star1" title="1 Bintang">&#9733;</label>
+                </div>
+              </div>
+              
+              <label>
+                Ulasan / Komentar
+                <textarea id="review-text" rows="3" placeholder="Kue browniesnya lumer banget, recommended!" required></textarea>
+              </label>
+              
+              <button class="review-submit-btn" type="submit">Kirim Ulasan</button>
+              <p class="review-success-msg" id="review-success-msg"></p>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="section location" id="lokasi">
+        <div class="section-heading">
+          <p class="eyebrow">Toko</p>
+          <h2>Ambil langsung atau kirim</h2>
+        </div>
+        <div class="location-grid">
+          <div class="map-card" aria-label="Peta lokasi Wisma Kue Chelsea">
+            <div class="map-visual" aria-hidden="true">
+              <span class="road road-main">Jl. Yos Sudarso</span>
+              <span class="road road-cross">Kel. Tamanan</span>
+              <span class="road road-small">Tulungagung</span>
+              <span class="map-pin">Wisma Kue Chelsea</span>
+            </div>
+            <iframe
+              class="map-frame"
+              title="Peta Wisma Kue Chelsea"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              src="https://maps.google.com/maps?q=Jalan%20Yos%20Sudarso%20No%2028%20Tamanan%20Tulungagung%20Jawa%20Timur&t=&z=16&ie=UTF8&iwloc=&output=embed">
+            </iframe>
+            <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Jalan%20Yos%20Sudarso%20No%2028%20Tamanan%20Tulungagung%20Jawa%20Timur" target="_blank" rel="noreferrer">
+              Buka Google Maps
+            </a>
+          </div>
+          <div class="store-detail">
+            <h3>Wisma Kue Chelsea Tulungagung</h3>
+            <p>Jalan Yos Sudarso No 28, Kelurahan Tamanan, Kabupaten Tulungagung, Jawa Timur.</p>
+            <p>Telepon/WhatsApp: 0821-4298-9334. Jam buka 08.00-20.00. Untuk custom cake, lakukan pemesanan minimal H-2.</p>
+            <a class="secondary-link dark" href="https://wa.me/6282142989334" target="_blank" rel="noreferrer">Chat admin</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="cart-panel" id="cart-panel" aria-label="Keranjang belanja" aria-hidden="true">
+      <div class="cart-panel-inner">
+        <div class="cart-header">
+          <div>
+            <p class="eyebrow">Pesanan</p>
+            <h2>Keranjang</h2>
+          </div>
+          <button class="icon-button" id="close-cart" type="button" aria-label="Tutup keranjang">x</button>
+        </div>
+        <div class="cart-items" id="cart-items"></div>
+        <div class="cart-empty" id="cart-empty">Cart masih kosong.</div>
+        <div class="cart-footer">
+          <div class="promo-section">
+            <div class="promo-input-row">
+              <input type="text" id="promo-code" placeholder="Kode Promo (e.g., MAMA10)" aria-label="Kode Promo">
+              <button class="promo-apply-btn" id="apply-promo-btn" type="button">Terapkan</button>
+            </div>
+            <p class="promo-message" id="promo-message" aria-live="polite"></p>
+          </div>
+          <div class="cart-total" id="cart-discount-row" hidden>
+            <span>Diskon (<span id="applied-promo-label">-</span>)</span>
+            <strong id="cart-discount" class="discount-value">-Rp0</strong>
+          </div>
+          <div class="cart-total">
+            <span>Total</span>
+            <strong id="cart-total">Rp0</strong>
+          </div>
+          <form class="checkout-form" id="checkout-form">
+            <fieldset>
+              <legend>Metode pesanan</legend>
+              <label class="choice-card">
+                <input type="radio" name="fulfillment" value="delivery" checked>
+                <span>
+                  <strong>Delivery</strong>
+                  <small>Kirim ke alamat tujuan.</small>
+                </span>
+              </label>
+              <label class="choice-card">
+                <input type="radio" name="fulfillment" value="pickup">
+                <span>
+                  <strong>Pick up</strong>
+                  <small>Ambil langsung di toko.</small>
+                </span>
+              </label>
+            </fieldset>
+            <label>
+              Nama
+              <input id="customer-name" name="customerName" type="text" autocomplete="name" required>
+            </label>
+            <label>
+              No telepon
+              <input id="customer-phone" name="customerPhone" type="tel" autocomplete="tel" required>
+            </label>
+            <label>
+              Tanggal dan jam
+              <input id="order-date" name="orderDate" type="datetime-local" required>
+            </label>
+            <label id="delivery-fields">
+              Alamat delivery
+              <textarea id="order-address" name="orderAddress" rows="3" required></textarea>
+            </label>
+            <label>
+              Catatan
+              <textarea id="order-note" name="orderNote" rows="2" placeholder="Contoh: tulis nama di cake, tanpa pita, dll."></textarea>
+            </label>
+            <button class="checkout-button" id="checkout" type="submit">Buat pesanan</button>
+            <p class="checkout-message" id="checkout-message" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </aside>
+    <!-- Modal Pembayaran -->
+    <div class="payment-modal" id="payment-modal" aria-hidden="true">
+      <div class="payment-modal-inner">
+        <button class="payment-close-button" id="close-payment" type="button" aria-label="Tutup pembayaran">&times;</button>
+        
+        <!-- State 1: Detail & Pilihan Pembayaran -->
+        <div id="payment-gateway-state">
+          <div class="payment-header">
+            <span class="eyebrow">Checkout</span>
+            <h2>Pembayaran</h2>
+            <div class="order-info-summary">
+              <p>ID Pesanan: <strong id="pay-order-id">-</strong></p>
+              <p>Total Tagihan: <strong id="pay-order-total" class="highlight-total">Rp0</strong></p>
+            </div>
+          </div>
+          
+          <div class="payment-tabs">
+            <button class="pay-tab-btn active" data-tab="bank" type="button">Transfer Bank</button>
+            <button class="pay-tab-btn" data-tab="qris" type="button">QRIS / Gopay / OVO</button>
+          </div>
+          
+          <div class="payment-tab-content active" id="tab-bank">
+            <p class="tab-instruction">Silakan transfer ke salah satu rekening bank resmi kami:</p>
+            <div class="bank-accounts">
+              <div class="bank-card">
+                <div class="bank-logo">BCA</div>
+                <div class="bank-details">
+                  <strong>123-4298-933</strong>
+                  <button class="copy-btn" type="button" data-copy="123-4298-933">Salin</button>
+                  <small>a.n. Wisma Kue Chelsea</small>
+                </div>
+              </div>
+              <div class="bank-card">
+                <div class="bank-logo">MANDIRI</div>
+                <div class="bank-details">
+                  <strong>138001122334</strong>
+                  <button class="copy-btn" type="button" data-copy="138001122334">Salin</button>
+                  <small>a.n. Wisma Kue Chelsea</small>
+                </div>
+              </div>
+            </div>
+            
+            <form class="payment-upload-form" id="payment-upload-form">
+              <label class="upload-label">
+                <span>Unggah Bukti Transfer (Gambar)</span>
+                <input type="file" id="transfer-proof" accept="image/*" required>
+                <div class="upload-dropzone">
+                  <svg class="upload-icon" viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M12 16V8m0 0l-4 4m4-4l4 4m-9 8h10a2 2 0 002-2V10a2 2 0 00-2-2h-3L12 3 9 8H6a2 2 0 00-2 2v8a2 2 0 002 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <p id="file-name-display">Klik untuk memilih file bukti transfer...</p>
+                </div>
+              </label>
+              <button class="pay-confirm-btn" type="submit">Konfirmasi Pembayaran</button>
+            </form>
+          </div>
+          
+          <div class="payment-tab-content" id="tab-qris">
+            <p class="tab-instruction">Scan QR Code di bawah menggunakan aplikasi E-Wallet atau Mobile Banking Anda:</p>
+            <div class="qris-container">
+              <div class="qris-mock-qr">
+                <div class="qr-corners"></div>
+                <div class="qr-logo">QRIS</div>
+                <div class="qr-code-grid"></div>
+                <div class="qr-scanner-line"></div>
+              </div>
+              <div class="qris-timer">
+                <span>Sisa waktu pembayaran:</span>
+                <strong id="qris-countdown">15:00</strong>
+              </div>
+            </div>
+            <button class="pay-confirm-btn" id="qris-done-btn" type="button">Saya Sudah Bayar</button>
+          </div>
+        </div>
+        
+        <!-- State 2: Pembayaran Sukses -->
+        <div id="payment-success-state" hidden>
+          <div class="success-screen">
+            <div class="success-icon-wrapper">
+              <div class="success-icon-circle"></div>
+              <svg class="success-icon-check" viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor">
+                <path d="M20 6L9 17l-5-5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h2>Pembayaran Berhasil!</h2>
+            <p class="success-text">Terima kasih atas pesanan Anda. Kami sedang memproses kue lezat Anda.</p>
+            <div class="success-order-details">
+              <div class="detail-row"><span>ID Pesanan:</span><strong id="success-id">-</strong></div>
+              <div class="detail-row"><span>Nama:</span><span id="success-name">-</span></div>
+              <div class="detail-row"><span>Metode:</span><span id="success-method">-</span></div>
+              <div class="detail-row"><span>Total:</span><strong id="success-total">-</strong></div>
+            </div>
+            <button class="print-receipt-action-btn" id="success-print-btn" type="button">Cetak Nota Belanja</button>
+            <button class="success-close-btn" id="success-done" type="button">Kembali Belanja</button>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+
+    <!-- Modal Admin Dashboard -->
+    <div class="admin-modal" id="admin-modal" aria-hidden="true">
+      <div class="admin-modal-inner">
+        <button class="admin-close-button" id="close-admin" type="button" aria-label="Tutup admin">&times;</button>
+        
+        <!-- State 1: Login Admin -->
+        <div id="admin-login-state">
+          <div class="admin-header text-center">
+            <span class="eyebrow">Akses Terbatas</span>
+            <h2>Login Admin</h2>
+            <p>Masukkan sandi admin untuk mengakses dashboard pengelolaan toko.</p>
+          </div>
+          <form class="admin-login-form" id="admin-login-form">
+            <label>
+              Kata Sandi Admin
+              <input type="password" id="admin-password" placeholder="Masukkan sandi..." required>
+            </label>
+            <p class="login-error-msg" id="login-error-msg" aria-live="polite"></p>
+            <button class="admin-action-btn" type="submit">Masuk Dashboard</button>
+          </form>
+        </div>
+        
+        <!-- State 2: Dashboard Admin -->
+        <div id="admin-dashboard-state" hidden>
+          <div class="admin-header">
+            <span class="eyebrow">Dashboard</span>
+            <h2>Kelola Wisma Kue Chelsea</h2>
+            <p>Halo Admin! Di sini Anda dapat merubah pengumuman, mengatur kode diskon, dan meninjau pesanan pelanggan.</p>
+          </div>
+          
+          <div class="admin-layout">
+            <nav class="admin-side-nav" aria-label="Navigasi admin">
+              <button class="admin-tab-btn active" data-admin-tab="orders" type="button">Daftar Pesanan</button>
+              <button class="admin-tab-btn" data-admin-tab="discounts" type="button">Kelola Diskon</button>
+              <button class="admin-tab-btn" data-admin-tab="news" type="button">Update Berita</button>
+              <button class="admin-tab-btn logout-btn" id="admin-logout-btn" type="button">Keluar</button>
+            </nav>
+            
+            <main class="admin-main-content">
+              <!-- Tab 1: Daftar Pesanan -->
+              <section class="admin-section-content active" id="admin-orders">
+                <h3>Pesanan Masuk</h3>
+                <p>Klik tombol rincian pesanan untuk meninjau bukti pembayaran.</p>
+                <div class="admin-table-wrapper">
+                  <table class="admin-table">
+                    <thead>
+                      <tr>
+                        <th>ID Pesanan</th>
+                        <th>Nama Pelanggan</th>
+                        <th>Metode</th>
+                        <th>Total</th>
+                        <th>Aksi / Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="admin-orders-list">
+                      <!-- Diisi dinamis lewat JS -->
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+              
+              <!-- Tab 2: Kelola Diskon -->
+              <section class="admin-section-content" id="admin-discounts">
+                <h3>Pengaturan Kode Promo</h3>
+                <form class="admin-setting-form" id="admin-promo-form">
+                  <label>
+                    Kode Promo Aktif
+                    <input type="text" id="admin-promo-code" placeholder="Contoh: MAMA10" required>
+                  </label>
+                  <label>
+                    Persentase Diskon (%)
+                    <input type="number" id="admin-promo-percent" min="0" max="100" placeholder="Contoh: 10" required>
+                  </label>
+                  <button class="admin-action-btn" type="submit">Simpan Konfigurasi Diskon</button>
+                  <p class="admin-setting-status" id="promo-save-status"></p>
+                </form>
+              </section>
+              
+              <!-- Tab 3: Update Berita -->
+              <section class="admin-section-content" id="admin-news">
+                <h3>Update Pengumuman Banner</h3>
+                <form class="admin-setting-form" id="admin-announcement-form">
+                  <label>
+                    Teks Pengumuman Banner (Paling atas)
+                    <textarea id="admin-announcement-text" rows="4" placeholder="Ketik pengumuman baru..." required></textarea>
+                  </label>
+                  <button class="admin-action-btn" type="submit">Update Banner Pengumuman</button>
+                  <p class="admin-setting-status" id="news-save-status"></p>
+                </form>
+              </section>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Bukti Bayar Popover (di dalam admin) -->
+    <div class="receipt-popover" id="receipt-popover" aria-hidden="true">
+      <div class="receipt-popover-inner">
+        <button class="receipt-popover-close" id="close-receipt-popover" type="button">&times;</button>
+        <h3>Bukti Pembayaran</h3>
+        <div class="receipt-image-container">
+          <img id="receipt-preview-img" src="" alt="Bukti Transfer">
+          <p id="no-receipt-placeholder" hidden>Tidak ada bukti transfer diunggah (pembayaran via QRIS).</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Kustomisasi Produk (Kue) -->
+    <div class="customizer-modal" id="product-customizer-modal" aria-hidden="true">
+      <div class="customizer-modal-inner">
+        <button class="customizer-close-button" id="close-customizer" type="button" aria-label="Tutup kustomisasi">&times;</button>
+        <div class="customizer-header">
+          <span class="eyebrow" id="cust-product-category">Cake</span>
+          <h2 id="cust-product-name">Birthday Cake</h2>
+          <p id="cust-product-desc">Custom tulisan, rasa vanilla berry atau cokelat.</p>
+        </div>
+        <form id="customizer-form">
+          <div class="customizer-options">
+            <!-- Pilihan Ukuran -->
+            <fieldset class="custom-option-group">
+              <legend>Pilih Ukuran Kue</legend>
+              <label class="option-radio-label">
+                <input type="radio" name="cake-size" value="mini" checked>
+                <span class="option-title">Mini 12 cm <span class="option-price-diff">(Harga Dasar)</span></span>
+              </label>
+              <label class="option-radio-label">
+                <input type="radio" name="cake-size" value="medium">
+                <span class="option-title">Medium 18 cm <span class="option-price-diff">(+Rp35.000)</span></span>
+              </label>
+              <label class="option-radio-label">
+                <input type="radio" name="cake-size" value="large">
+                <span class="option-title">Large 22 cm <span class="option-price-diff">(+Rp70.000)</span></span>
+              </label>
+            </fieldset>
+
+            <!-- Pilihan Topping -->
+            <fieldset class="custom-option-group">
+              <legend>Topping Tambahan (Bisa pilih lebih dari satu)</legend>
+              <label class="option-checkbox-label">
+                <input type="checkbox" name="cake-topping" value="keju">
+                <span class="option-title">Extra Keju Parut <span class="option-price-diff">(+Rp5.000)</span></span>
+              </label>
+              <label class="option-checkbox-label">
+                <input type="checkbox" name="cake-topping" value="almond">
+                <span class="option-title">Taburan Kacang Almond <span class="option-price-diff">(+Rp5.000)</span></span>
+              </label>
+              <label class="option-checkbox-label">
+                <input type="checkbox" name="cake-topping" value="lilin">
+                <span class="option-title">Lilin Ulang Tahun <span class="option-price-diff">(+Rp2.000)</span></span>
+              </label>
+            </fieldset>
+
+            <!-- Tulisan di atas Kue -->
+            <div class="custom-text-group">
+              <label for="cake-writing">Tulisan di Atas Kue (Maksimal 25 Karakter)</label>
+              <input type="text" id="cake-writing" maxlength="25" placeholder="Contoh: Happy Birthday Mama">
+            </div>
+          </div>
+
+          <div class="customizer-footer">
+            <div class="customizer-price-summary">
+              <span>Total Harga Item:</span>
+              <strong id="customizer-total-price">Rp0</strong>
+            </div>
+            <button class="customizer-add-btn" type="submit">Tambahkan ke Keranjang</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Hidden Print Receipt Template -->
+    <div id="print-receipt-template" aria-hidden="true" hidden>
+      <div class="print-receipt-container">
+        <div class="print-header">
+          <h2>Wisma Kue Chelsea</h2>
+          <p>Jl. Yos Sudarso No 28, Tamanan, Tulungagung</p>
+          <p>Telp: 0821-4298-9334</p>
+        </div>
+        <div class="print-divider">--------------------------------</div>
+        <div class="print-meta">
+          <p><strong>ID ORDER:</strong> <span id="print-id">-</span></p>
+          <p><strong>TANGGAL:</strong> <span id="print-date">-</span></p>
+          <p><strong>PELANGGAN:</strong> <span id="print-name">-</span></p>
+          <p><strong>TELP:</strong> <span id="print-phone">-</span></p>
+          <p><strong>METODE:</strong> <span id="print-method">-</span></p>
+          <p id="print-address-row" hidden><strong>ALAMAT:</strong> <span id="print-address">-</span></p>
+        </div>
+        <div class="print-divider">--------------------------------</div>
+        <div class="print-items-header">
+          <span>ITEM</span>
+          <span>QTY</span>
+          <span>SUBTOTAL</span>
+        </div>
+        <div class="print-divider">--------------------------------</div>
+        <div id="print-items-list">
+          <!-- Dinamis -->
+        </div>
+        <div class="print-divider">--------------------------------</div>
+        <div class="print-totals">
+          <p>Subtotal: <span id="print-subtotal">-</span></p>
+          <p id="print-discount-row" hidden>Diskon: <span id="print-discount">-</span></p>
+          <p class="print-grand-total">GRAND TOTAL: <span id="print-total">-</span></p>
+        </div>
+        <div class="print-divider">--------------------------------</div>
+        <div class="print-notes" id="print-notes-container" hidden>
+          <p><strong>Catatan/Kustomisasi Kue:</strong></p>
+          <p id="print-notes" class="notes-text">-</p>
+        </div>
+        <div class="print-footer">
+          <p>Terima kasih atas pesanan Anda!</p>
+          <p>Wisma Kue Chelsea - Panggang dengan Cinta</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <footer class="site-footer">
+      <span>&copy; 2026 Wisma Kue Chelsea. Semua Hak Dilindungi.</span>
+      <span>Dibuat dengan kasih sayang untuk Mama. | <button class="admin-link-btn" id="open-admin-btn" type="button">Area Admin</button></span>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
