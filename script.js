@@ -154,6 +154,7 @@ const closeAdmin = document.querySelector("#close-admin");
 const adminLoginForm = document.querySelector("#admin-login-form");
 const adminLoginState = document.querySelector("#admin-login-state");
 const adminDashboardState = document.querySelector("#admin-dashboard-state");
+const adminUsernameInput = document.querySelector("#admin-username");
 const adminPasswordInput = document.querySelector("#admin-password");
 const loginErrorMsg = document.querySelector("#login-error-msg");
 const adminTabBtns = document.querySelectorAll(".admin-tab-btn");
@@ -781,6 +782,7 @@ function closePaymentModal() {
 function openAdminModal() {
   adminLoginState.hidden = false;
   adminDashboardState.hidden = true;
+  if (adminUsernameInput) adminUsernameInput.value = "";
   adminPasswordInput.value = "";
   loginErrorMsg.textContent = "";
   
@@ -898,14 +900,16 @@ function handleAdminTabSwitch(event) {
 
 function handleAdminLogin(event) {
   event.preventDefault();
+  const username = adminUsernameInput.value.trim().toLowerCase();
   const password = adminPasswordInput.value;
-  if (password === "WKC@mama2026!") {
+  
+  if ((username === "admin" || username === "mamachelsea") && password === "WKC@mama2026!") {
     adminLoginState.hidden = true;
     adminDashboardState.hidden = false;
     loginErrorMsg.textContent = "";
     loadAdminDashboard();
   } else {
-    loginErrorMsg.textContent = "Kata sandi salah. Coba lagi.";
+    loginErrorMsg.textContent = "Username atau kata sandi salah. Coba lagi.";
   }
 }
 
