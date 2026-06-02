@@ -944,12 +944,23 @@ function renderAdminOrders() {
           const name = order.customer_name || order.customerName || "-";
           const phone = order.customer_phone || order.customerPhone || "-";
           const date = order.order_date || order.orderDate;
+          const rawAddress = order.order_address || order.orderAddress || "";
+          
+          let formattedAddress = rawAddress;
+          if (rawAddress.includes("https://www.google.com/maps/search/?api=1")) {
+            // Convert Google Maps link inside (Maps: URL) to a clickable anchor
+            formattedAddress = rawAddress.replace(/\(Maps:\s*(https?:\/\/[^\s\)]+)\)/g, (match, url) => {
+              return `(<a href="${url}" target="_blank" style="color:var(--berry);text-decoration:underline;font-weight:bold;">🗺️ Buka Peta</a>)`;
+            });
+          }
+          
           return `
             <tr>
               <td><strong>${order.id}</strong></td>
               <td>
                 <strong>${name}</strong><br>
                 <small>${phone}</small>
+                ${formattedAddress ? `<br><small style="display:block;margin-top:6px;line-height:1.3;color:var(--muted);max-width:240px;word-break:break-word;">📍 Alamat: ${formattedAddress}</small>` : ""}
               </td>
               <td>
                 <span>${order.fulfillment}</span><br>
