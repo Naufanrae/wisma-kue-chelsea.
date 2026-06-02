@@ -736,7 +736,7 @@ function handleAdminTabSwitch(event) {
 function handleAdminLogin(event) {
   event.preventDefault();
   const password = adminPasswordInput.value;
-  if (password === "admin123") {
+  if (password === "WKC@mama2026!") {
     adminLoginState.hidden = true;
     adminDashboardState.hidden = false;
     loginErrorMsg.textContent = "";
