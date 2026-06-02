@@ -103,6 +103,8 @@ const products = [
 let activeFilter = "all";
 let searchQuery = "";
 let cart = {};
+let checkoutMap = null;
+let checkoutMarker = null;
 
 const rupiah = new Intl.NumberFormat("id-ID", {
   style: "currency",
@@ -372,7 +374,7 @@ function renderCart() {
   const finalTotal = total - discountAmount;
   cartTotal.textContent = rupiah.format(finalTotal);
   cartEmpty.hidden = entries.length > 0;
-  checkoutButton.disabled = entries.length === 0;
+  updateCheckoutButtonState();
 
   cartItems.innerHTML = entries
     .map(
@@ -479,6 +481,154 @@ function updateFulfillmentFields() {
   if (!isDelivery) {
     orderAddress.value = "";
   }
+  updateCheckoutButtonState();
+  if (isDelivery) {
+    initCheckoutMap();
+  }
+}
+
+function updateCheckoutButtonState() {
+  const entries = Object.keys(cart);
+  if (entries.length === 0) {
+    checkoutButton.disabled = true;
+    checkoutButton.textContent = "Buat pesanan";
+    return;
+  }
+
+  const fulfillment = new FormData(checkoutForm).get("fulfillment");
+  const isDelivery = fulfillment === "delivery";
+  if (!isDelivery) {
+    checkoutButton.disabled = false;
+    checkoutButton.textContent = "Buat pesanan";
+  } else {
+    const lat = document.querySelector("#delivery-lat").value;
+    const lng = document.querySelector("#delivery-lng").value;
+    if (!lat || !lng) {
+      checkoutButton.disabled = true;
+      checkoutButton.textContent = "Pilih Lokasi di Peta";
+    } else {
+      const STORE_LAT = -8.0654;
+      const STORE_LNG = 111.9024;
+      const RADIUS_KM = 15;
+      if (typeof L !== "undefined") {
+        const storeLatLng = L.latLng(STORE_LAT, STORE_LNG);
+        const markerLatLng = L.latLng(parseFloat(lat), parseFloat(lng));
+        const distanceMeters = storeLatLng.distanceTo(markerLatLng);
+        if (distanceMeters > RADIUS_KM * 1000) {
+          checkoutButton.disabled = true;
+          checkoutButton.textContent = "Di Luar Jangkauan (Max 15km)";
+        } else {
+          checkoutButton.disabled = false;
+          checkoutButton.textContent = "Buat pesanan";
+        }
+      } else {
+        checkoutButton.disabled = false;
+        checkoutButton.textContent = "Buat pesanan";
+      }
+    }
+  }
+}
+
+function initCheckoutMap() {
+  const mapEl = document.querySelector("#checkout-delivery-map");
+  if (!mapEl || typeof L === "undefined") return;
+
+  // If map is already initialized, just invalidate size
+  if (checkoutMap) {
+    setTimeout(() => {
+      checkoutMap.invalidateSize();
+    }, 200);
+    return;
+  }
+
+  const STORE_LAT = -8.0654;
+  const STORE_LNG = 111.9024;
+  const RADIUS_KM = 15;
+
+  checkoutMap = L.map("checkout-delivery-map").setView([STORE_LAT, STORE_LNG], 12);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 18
+  }).addTo(checkoutMap);
+
+  // Store marker
+  const storeIcon = L.divIcon({
+    className: "store-map-marker-checkout",
+    html: '<div style="background:#8B0000;color:#FFD700;padding:4px 8px;border-radius:20px;font-weight:700;font-size:10px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.3);border:1.5px solid #FFD700;">📍 Wisma Kue Chelsea</div>',
+    iconSize: [140, 28],
+    iconAnchor: [70, 28]
+  });
+  L.marker([STORE_LAT, STORE_LNG], { icon: storeIcon }).addTo(checkoutMap);
+
+  // Delivery radius circle
+  L.circle([STORE_LAT, STORE_LNG], {
+    radius: RADIUS_KM * 1000,
+    color: "#8B0000",
+    weight: 2,
+    fillColor: "#FFD700",
+    fillOpacity: 0.08,
+    dashArray: "6 4"
+  }).addTo(checkoutMap);
+
+  const statusEl = document.querySelector("#checkout-map-status");
+  const latInput = document.querySelector("#delivery-lat");
+  const lngInput = document.querySelector("#delivery-lng");
+
+  // Initial state check
+  if (!latInput.value || !lngInput.value) {
+    checkoutButton.disabled = true;
+    if (statusEl) {
+      statusEl.textContent = "Silakan tentukan titik lokasi pengiriman di peta.";
+      statusEl.className = "map-distance-status";
+    }
+  }
+
+  // Handle map click
+  checkoutMap.on("click", (e) => {
+    const clickedLatLng = e.latlng;
+    latInput.value = clickedLatLng.lat;
+    lngInput.value = clickedLatLng.lng;
+
+    // Update marker
+    if (checkoutMarker) {
+      checkoutMarker.setLatLng(clickedLatLng);
+    } else {
+      checkoutMarker = L.marker(clickedLatLng, { draggable: true }).addTo(checkoutMap);
+      checkoutMarker.on("dragend", (event) => {
+        const markerLatLng = event.target.getLatLng();
+        latInput.value = markerLatLng.lat;
+        lngInput.value = markerLatLng.lng;
+        const dist = L.latLng(STORE_LAT, STORE_LNG).distanceTo(markerLatLng);
+        updateDistanceStatus(dist);
+        updateCheckoutButtonState();
+      });
+    }
+
+    const dist = L.latLng(STORE_LAT, STORE_LNG).distanceTo(clickedLatLng);
+    updateDistanceStatus(dist);
+    updateCheckoutButtonState();
+  });
+
+  function updateDistanceStatus(distanceMeters) {
+    const distanceKm = (distanceMeters / 1000).toFixed(2);
+    if (distanceMeters > RADIUS_KM * 1000) {
+      if (statusEl) {
+        statusEl.textContent = `Jarak: ${distanceKm} km. Di luar batas radius 15 km!`;
+        statusEl.className = "map-distance-status unavailable";
+      }
+    } else {
+      if (statusEl) {
+        statusEl.textContent = `Jarak: ${distanceKm} km. Lokasi dalam jangkauan delivery ✓`;
+        statusEl.className = "map-distance-status available";
+      }
+    }
+  }
+
+  // Fix rendering issues for hidden maps
+  setTimeout(() => {
+    checkoutMap.invalidateSize();
+  }, 200);
 }
 
 // Apply Promo Code
@@ -603,6 +753,13 @@ function completePayment() {
   document.querySelector("#promo-message").textContent = "";
   renderCart();
   checkoutForm.reset();
+  
+  // Clear checkout map marker
+  if (checkoutMarker && checkoutMap) {
+    checkoutMap.removeLayer(checkoutMarker);
+    checkoutMarker = null;
+  }
+  
   updateFulfillmentFields();
   currentReceiptBase64 = "";
 }
@@ -949,13 +1106,22 @@ function checkout(event) {
     discount = Math.round(subtotal * (promoPercent / 100));
   }
   
+  let finalAddress = formData.get("orderAddress").trim();
+  if (fulfillment === "delivery") {
+    const lat = document.querySelector("#delivery-lat").value;
+    const lng = document.querySelector("#delivery-lng").value;
+    if (lat && lng) {
+      finalAddress += ` (Maps: https://www.google.com/maps/search/?api=1&query=${lat},${lng})`;
+    }
+  }
+
   const order = {
     id: `WKC-${Date.now().toString().slice(-6)}`,
     fulfillment: fulfillmentLabel,
     customerName: formData.get("customerName").trim(),
     customerPhone: formData.get("customerPhone").trim(),
     orderDate: formData.get("orderDate"),
-    orderAddress: formData.get("orderAddress").trim(),
+    orderAddress: finalAddress,
     orderNote: formData.get("orderNote").trim(),
     items: getCartEntries(),
     subtotal: subtotal,

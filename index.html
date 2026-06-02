@@ -20,7 +20,7 @@
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="preload" href="assets/bakery-hero.png" as="image">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-    <link rel="stylesheet" href="styles.css?v=1.0.5">
+    <link rel="stylesheet" href="styles.css?v=1.0.6">
     <meta name="google-site-verification" content="zO7uk7lBAUG25OQgPnJLIui5kVpnYBPNWX3JbrJcDjA">
     <script src="https://www.google.com/recaptcha/api.js?render=6LcucgktAAAAAlvQ71pfRYNFtyF_RjF2IXEuzNmv"></script>
   </head>
@@ -250,10 +250,19 @@
               Tanggal dan jam
               <input id="order-date" name="orderDate" type="datetime-local" required>
             </label>
-            <label id="delivery-fields">
-              Alamat delivery
-              <textarea id="order-address" name="orderAddress" rows="3" required></textarea>
-            </label>
+            <div id="delivery-fields">
+              <label>
+                Alamat delivery
+                <textarea id="order-address" name="orderAddress" rows="3" required></textarea>
+              </label>
+              <div class="checkout-map-section" style="margin-top: 12px; margin-bottom: 12px;">
+                <span class="field-label" style="display: block; font-weight: 800; font-size: 0.9rem; margin-bottom: 6px; color: var(--ink);">Tandai Lokasi Pengiriman di Peta:</span>
+                <div id="checkout-delivery-map" class="checkout-map-container"></div>
+                <p class="map-distance-status" id="checkout-map-status" style="margin: 6px 0 0; font-size: 0.82rem; font-weight: 800; color: var(--muted);">Silakan klik peta untuk menentukan lokasi pengiriman.</p>
+                <input type="hidden" id="delivery-lat" name="deliveryLat">
+                <input type="hidden" id="delivery-lng" name="deliveryLng">
+              </div>
+            </div>
             <label>
               Catatan
               <textarea id="order-note" name="orderNote" rows="2" placeholder="Contoh: tulis nama di cake, tanpa pita, dll."></textarea>
@@ -632,7 +641,7 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="db.js?v=1.0.5"></script>
-    <script src="script.js?v=1.0.5"></script>
+    <script src="db.js?v=1.0.6"></script>
+    <script src="script.js?v=1.0.6"></script>
   </body>
 </html>
