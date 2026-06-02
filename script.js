@@ -994,21 +994,22 @@ function handleAnnouncementSave(event) {
 }
 
 function viewOrderReceipt(orderId) {
-  const orders = JSON.parse(localStorage.getItem("wkcOrders") || "[]");
-  const order = orders.find(o => o.id === orderId);
-  if (order) {
-    if (order.receipt) {
-      receiptPreviewImg.src = order.receipt;
-      receiptPreviewImg.hidden = false;
-      noReceiptPlaceholder.hidden = true;
-    } else {
-      receiptPreviewImg.src = "";
-      receiptPreviewImg.hidden = true;
-      noReceiptPlaceholder.hidden = false;
+  dbGetOrders().then(orders => {
+    const order = orders.find(o => o.id === orderId);
+    if (order) {
+      if (order.receipt) {
+        receiptPreviewImg.src = order.receipt;
+        receiptPreviewImg.hidden = false;
+        noReceiptPlaceholder.hidden = true;
+      } else {
+        receiptPreviewImg.src = "";
+        receiptPreviewImg.hidden = true;
+        noReceiptPlaceholder.hidden = false;
+      }
+      receiptPopover.classList.add("open");
+      receiptPopover.setAttribute("aria-hidden", "false");
     }
-    receiptPopover.classList.add("open");
-    receiptPopover.setAttribute("aria-hidden", "false");
-  }
+  });
 }
 
 function closeReceiptPopoverModal() {
