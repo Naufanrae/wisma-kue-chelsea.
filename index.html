@@ -2,12 +2,26 @@
 <html lang="id">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Toko kue online untuk pre-order bolen, brownies, cake, dan hampers.">
-    <title>Wisma Kue Chelsea</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+    <meta name="description" content="Wisma Kue Chelsea Tulungagung — Toko kue online terbaik untuk pre-order bolen pisang keju, brownies cokelat, cake ulang tahun custom, hampers premium, dan jajanan khas Tulungagung. Pesan sekarang!">
+    <meta name="keywords" content="wisma kue chelsea, toko kue tulungagung, jajanan tulungagung, oleh-oleh tulungagung, kue tulungagung, bolen pisang keju tulungagung, brownies tulungagung, cake ulang tahun tulungagung, hampers tulungagung, kue online tulungagung, bakery tulungagung">
+    <meta name="author" content="Wisma Kue Chelsea">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Wisma Kue Chelsea — Toko Kue & Jajanan Tulungagung">
+    <meta property="og:description" content="Bolen, brownies, cake ulang tahun, dan hampers premium siap pesan. Delivery area Tulungagung dan sekitarnya.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://wisma-kue-chelsea.vercel.app">
+    <meta property="og:locale" content="id_ID">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Wisma Kue Chelsea — Toko Kue Tulungagung">
+    <meta name="twitter:description" content="Bolen, brownies, cake ulang tahun, dan hampers premium.">
+    <link rel="canonical" href="https://wisma-kue-chelsea.vercel.app">
+    <title>Wisma Kue Chelsea — Toko Kue & Jajanan Tulungagung</title>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="preload" href="assets/bakery-hero.png" as="image">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://www.google.com/recaptcha/api.js?render=6LcucgktAAAAAlvQ71pfRYNFtyF_RjF2IXEuzNmv"></script>
   </head>
   <body>
     <div class="announcement-bar" id="announcement-bar">
@@ -168,6 +182,11 @@
             <p>Jalan Yos Sudarso No 28, Kelurahan Tamanan, Kabupaten Tulungagung, Jawa Timur.</p>
             <p>Telepon/WhatsApp: 0821-4298-9334. Jam buka 08.00-20.00. Untuk custom cake, lakukan pemesanan minimal H-2.</p>
             <a class="secondary-link dark" href="https://wa.me/6282142989334" target="_blank" rel="noreferrer">Chat admin</a>
+          </div>
+          <div class="delivery-map-card">
+            <h3>Area Delivery (Radius 15 km)</h3>
+            <p>Kami melayani pengiriman dalam radius 15 km dari toko. Cek apakah lokasi Anda termasuk area delivery.</p>
+            <div id="delivery-map" class="delivery-map-container"></div>
           </div>
         </div>
       </section>
@@ -379,6 +398,7 @@
               <button class="admin-tab-btn active" data-admin-tab="orders" type="button">Daftar Pesanan</button>
               <button class="admin-tab-btn" data-admin-tab="discounts" type="button">Kelola Diskon</button>
               <button class="admin-tab-btn" data-admin-tab="news" type="button">Update Berita</button>
+              <button class="admin-tab-btn" data-admin-tab="database" type="button">Koneksi Database</button>
               <button class="admin-tab-btn logout-btn" id="admin-logout-btn" type="button">Keluar</button>
             </nav>
             
@@ -433,6 +453,48 @@
                   <button class="admin-action-btn" type="submit">Update Banner Pengumuman</button>
                   <p class="admin-setting-status" id="news-save-status"></p>
                 </form>
+              </section>
+              <!-- Tab 4: Koneksi Database -->
+              <section class="admin-section-content" id="admin-database">
+                <h3>Koneksi Database Online</h3>
+                <p>Hubungkan website ke Supabase agar data pesanan dan ulasan tersinkronisasi di semua perangkat.</p>
+                <div class="db-status-row">
+                  <span>Status:</span>
+                  <span class="db-status-badge offline" id="db-status-badge">Lokal (Offline)</span>
+                </div>
+                <form class="admin-setting-form" id="admin-db-form">
+                  <label>
+                    Supabase Project URL
+                    <input type="url" id="admin-supabase-url" placeholder="https://xxxxx.supabase.co">
+                  </label>
+                  <label>
+                    Supabase Anon Key
+                    <input type="text" id="admin-supabase-key" placeholder="eyJhbGciOi...">
+                  </label>
+                  <button class="admin-action-btn" type="submit">Simpan & Hubungkan</button>
+                  <p class="admin-setting-status" id="db-save-status"></p>
+                </form>
+                <div class="db-migration-section">
+                  <h4>Migrasi Data Lokal ke Cloud</h4>
+                  <p>Upload data pesanan dan ulasan yang tersimpan di browser ke database online.</p>
+                  <button class="admin-action-btn secondary" id="migrate-data-btn" type="button">Upload Data Lokal ke Cloud</button>
+                  <p class="admin-setting-status" id="migrate-status"></p>
+                </div>
+                <div class="db-telegram-section">
+                  <h4>Notifikasi Telegram</h4>
+                  <p>Setiap pesanan baru akan mengirim notifikasi ke Telegram.</p>
+                  <label>
+                    Bot Token
+                    <input type="text" id="admin-tg-token" placeholder="123456:ABC-DEF...">
+                  </label>
+                  <label>
+                    Chat ID
+                    <input type="text" id="admin-tg-chatid" placeholder="123456789">
+                  </label>
+                  <button class="admin-action-btn" id="save-telegram-btn" type="button">Simpan Telegram</button>
+                  <button class="admin-action-btn secondary" id="test-telegram-btn" type="button">Test Kirim Notif</button>
+                  <p class="admin-setting-status" id="tg-save-status"></p>
+                </div>
               </section>
             </main>
           </div>
@@ -567,6 +629,9 @@
       <span>Dibuat dengan kasih sayang untuk Mama. | <button class="admin-link-btn" id="open-admin-btn" type="button">Area Admin</button></span>
     </footer>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="db.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

@@ -192,20 +192,20 @@ let activeCustomizerProductId = "";
 
 // Initialize dynamic announcements & default promo configurations
 function initAnnouncement() {
-  const announcement = localStorage.getItem("wkcAnnouncement");
-  if (!announcement) {
-    localStorage.setItem("wkcAnnouncement", "Promo Spesial: Dapatkan diskon 10% dengan kode promo MAMA10!");
-  }
-  document.querySelector("#announcement-text").textContent = localStorage.getItem("wkcAnnouncement");
+  dbGetSetting("announcement", "Promo Spesial: Dapatkan diskon 10% dengan kode promo MAMA10!").then(text => {
+    document.querySelector("#announcement-text").textContent = text;
+    // Also keep in localStorage for promo validation
+    localStorage.setItem("wkcAnnouncement", text);
+  });
 }
 
 function initPromoSettings() {
-  if (!localStorage.getItem("wkcPromoCode")) {
-    localStorage.setItem("wkcPromoCode", "MAMA10");
-  }
-  if (!localStorage.getItem("wkcPromoPercent")) {
-    localStorage.setItem("wkcPromoPercent", "10");
-  }
+  dbGetSetting("promoCode", "MAMA10").then(code => {
+    localStorage.setItem("wkcPromoCode", code);
+  });
+  dbGetSetting("promoPercent", "10").then(percent => {
+    localStorage.setItem("wkcPromoPercent", percent);
+  });
 }
 
 // Initialize Reviews
@@ -216,30 +216,33 @@ const defaultReviews = [
 ];
 
 function initReviews() {
-  const storedReviews = localStorage.getItem("wkcReviews");
-  if (!storedReviews) {
-    localStorage.setItem("wkcReviews", JSON.stringify(defaultReviews));
-  }
-  renderReviewsList();
+  dbGetReviews().then(reviews => {
+    if (!reviews || reviews.length === 0) {
+      // Save defaults
+      defaultReviews.forEach(r => dbAddReview(r));
+      localStorage.setItem("wkcReviews", JSON.stringify(defaultReviews));
+    }
+    renderReviewsList();
+  });
 }
 
 function renderReviewsList() {
-  const reviews = JSON.parse(localStorage.getItem("wkcReviews") || "[]");
-  const reviewsListEl = document.querySelector("#customer-reviews-list");
-  
-  reviewsListEl.innerHTML = reviews
-    .map(
-      (r) => `
-        <div class="review-card">
-          <div class="review-card-header">
-            <span class="review-author-name">${r.author}</span>
-            <span class="review-stars">${"&#9733;".repeat(r.rating)}${"&#9734;".repeat(5 - r.rating)}</span>
+  dbGetReviews().then(reviews => {
+    const reviewsListEl = document.querySelector("#customer-reviews-list");
+    reviewsListEl.innerHTML = reviews
+      .map(
+        (r) => `
+          <div class="review-card">
+            <div class="review-card-header">
+              <span class="review-author-name">${r.author}</span>
+              <span class="review-stars">${"&#9733;".repeat(r.rating)}${"&#9734;".repeat(5 - r.rating)}</span>
+            </div>
+            <p>"${r.text}"</p>
           </div>
-          <p>"${r.text}"</p>
-        </div>
-      `
-    )
-    .join("");
+        `
+      )
+      .join("");
+  });
 }
 
 function handleReviewSubmit(event) {
@@ -249,11 +252,9 @@ function handleReviewSubmit(event) {
   const text = document.querySelector("#review-text").value.trim();
   
   const newReview = { author, rating, text };
-  const reviews = JSON.parse(localStorage.getItem("wkcReviews") || "[]");
-  reviews.unshift(newReview);
-  
-  localStorage.setItem("wkcReviews", JSON.stringify(reviews));
-  renderReviewsList();
+  dbAddReview(newReview).then(() => {
+    renderReviewsList();
+  });
   
   const successMsg = document.querySelector("#review-success-msg");
   successMsg.textContent = "Ulasan Anda berhasil dikirim! Terima kasih.";
@@ -590,6 +591,9 @@ function completePayment() {
       return o;
     });
     localStorage.setItem("wkcOrders", JSON.stringify(updated));
+    
+    // Update in Supabase too
+    dbUpdateOrderReceipt(currentOrder.id, currentReceiptBase64, currentReceiptBase64 ? "Paid" : "Pending");
   }
   
   // Clear Cart & reset checkout form & promo
@@ -624,78 +628,89 @@ function openAdminModal() {
 
 // Order Printing Logic
 function printOrderReceipt(orderId) {
-  const orders = JSON.parse(localStorage.getItem("wkcOrders") || "[]");
-  const order = orders.find(o => o.id === orderId);
-  if (!order) return;
-  
-  document.querySelector("#print-id").textContent = order.id;
-  document.querySelector("#print-date").textContent = order.orderDate ? new Date(order.orderDate).toLocaleString("id-ID") : "-";
-  document.querySelector("#print-name").textContent = order.customerName;
-  document.querySelector("#print-phone").textContent = order.customerPhone;
-  document.querySelector("#print-method").textContent = order.fulfillment;
-  
-  const addressRow = document.querySelector("#print-address-row");
-  if (order.orderAddress) {
-    document.querySelector("#print-address").textContent = order.orderAddress;
-    addressRow.hidden = false;
-  } else {
-    addressRow.hidden = true;
-  }
-  
-  // Populate print items list
-  const printItemsList = document.querySelector("#print-items-list");
-  printItemsList.innerHTML = order.items
-    .map(item => {
-      let optionDesc = "";
-      if (item.customLabel) {
-        optionDesc = `<div class="print-item-options">* ${item.customLabel}</div>`;
-      }
-      return `
-        <div class="print-item-row">
-          <span class="print-item-name">
-            ${item.name}
-            ${optionDesc}
-          </span>
-          <span>${item.qty}</span>
-          <span>${rupiah.format(item.price * item.qty)}</span>
-        </div>
-      `;
-    })
-    .join("");
+  dbGetOrders().then(orders => {
+    const order = orders.find(o => o.id === orderId);
+    if (!order) return;
     
-  document.querySelector("#print-subtotal").textContent = rupiah.format(order.subtotal || order.total);
-  
-  const discountRow = document.querySelector("#print-discount-row");
-  if (order.discount > 0) {
-    document.querySelector("#print-discount").textContent = `-${rupiah.format(order.discount)}`;
-    discountRow.hidden = false;
-  } else {
-    discountRow.hidden = true;
-  }
-  
-  document.querySelector("#print-total").textContent = rupiah.format(order.total);
-  
-  const notesContainer = document.querySelector("#print-notes-container");
-  const notesText = document.querySelector("#print-notes");
-  
-  let notes = [];
-  if (order.orderNote) notes.push(`Catatan order: ${order.orderNote}`);
-  
-  order.items.forEach(item => {
-    if (item.options && item.options.writing) {
-      notes.push(`[${item.name}] Tulisan: "${item.options.writing}"`);
+    document.querySelector("#print-id").textContent = order.id;
+    document.querySelector("#print-date").textContent = order.order_date ? new Date(order.order_date).toLocaleString("id-ID") : (order.orderDate ? new Date(order.orderDate).toLocaleString("id-ID") : "-");
+    document.querySelector("#print-name").textContent = order.customer_name || order.customerName;
+    document.querySelector("#print-phone").textContent = order.customer_phone || order.customerPhone;
+    document.querySelector("#print-method").textContent = order.fulfillment;
+    
+    const addressRow = document.querySelector("#print-address-row");
+    const addr = order.order_address || order.orderAddress;
+    if (addr) {
+      document.querySelector("#print-address").textContent = addr;
+      addressRow.hidden = false;
+    } else {
+      addressRow.hidden = true;
     }
+    
+    // Populate print items list
+    const printItemsList = document.querySelector("#print-items-list");
+    const items = order.items || [];
+    printItemsList.innerHTML = items
+      .map(item => {
+        let optionDesc = "";
+        if (item.customLabel) {
+          optionDesc = `<div class="print-item-options">* ${item.customLabel}</div>`;
+        }
+        return `
+          <div class="print-item-row">
+            <span class="print-item-name">
+              ${item.name}
+              ${optionDesc}
+            </span>
+            <span>${item.qty}</span>
+            <span>${rupiah.format(item.price * item.qty)}</span>
+          </div>
+        `;
+      })
+      .join("");
+      
+    document.querySelector("#print-subtotal").textContent = rupiah.format(order.subtotal || order.total);
+    
+    const discountRow = document.querySelector("#print-discount-row");
+    if (order.discount > 0) {
+      document.querySelector("#print-discount").textContent = `-${rupiah.format(order.discount)}`;
+      discountRow.hidden = false;
+    } else {
+      discountRow.hidden = true;
+    }
+    
+    document.querySelector("#print-total").textContent = rupiah.format(order.total);
+    
+    const notesContainer = document.querySelector("#print-notes-container");
+    const notesText = document.querySelector("#print-notes");
+    
+    let notes = [];
+    const orderNote = order.order_note || order.orderNote;
+    if (orderNote) notes.push(`Catatan order: ${orderNote}`);
+    
+    items.forEach(item => {
+      if (item.options && item.options.writing) {
+        notes.push(`[${item.name}] Tulisan: "${item.options.writing}"`);
+      }
+    });
+    
+    if (notes.length > 0) {
+      notesText.innerHTML = notes.join("<br>");
+      notesContainer.hidden = false;
+    } else {
+      notesContainer.hidden = true;
+    }
+    
+    // Show the print template before printing
+    const printTemplate = document.querySelector("#print-receipt-template");
+    printTemplate.hidden = false;
+    
+    // Trigger print dialog
+    setTimeout(() => {
+      window.print();
+      printTemplate.hidden = true;
+    }, 100);
   });
-  
-  if (notes.length > 0) {
-    notesText.innerHTML = notes.join("<br>");
-    notesContainer.hidden = false;
-  } else {
-    notesContainer.hidden = true;
-  }
-  
-  // Trigger print dialog
-  window.print();
 }
 
 function closeAdminModal() {
@@ -735,44 +750,61 @@ function loadAdminDashboard() {
   adminPromoCodeInput.value = localStorage.getItem("wkcPromoCode") || "MAMA10";
   adminPromoPercentInput.value = localStorage.getItem("wkcPromoPercent") || "10";
   adminAnnouncementTextarea.value = localStorage.getItem("wkcAnnouncement") || "";
+  
+  // Load database settings
+  const dbUrlInput = document.querySelector("#admin-supabase-url");
+  const dbKeyInput = document.querySelector("#admin-supabase-key");
+  const tgTokenInput = document.querySelector("#admin-tg-token");
+  const tgChatIdInput = document.querySelector("#admin-tg-chatid");
+  if (dbUrlInput) dbUrlInput.value = localStorage.getItem("wkcSupabaseUrl") || "";
+  if (dbKeyInput) dbKeyInput.value = localStorage.getItem("wkcSupabaseKey") || "";
+  if (tgTokenInput) tgTokenInput.value = localStorage.getItem("wkcTgToken") || "";
+  if (tgChatIdInput) tgChatIdInput.value = localStorage.getItem("wkcTgChatId") || "";
+  
   renderAdminOrders();
 }
 
 function renderAdminOrders() {
-  const orders = JSON.parse(localStorage.getItem("wkcOrders") || "[]");
-  if (orders.length === 0) {
-    adminOrdersList.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 24px; color: var(--muted);">Belum ada pesanan masuk.</td></tr>`;
-    return;
-  }
-  
-  adminOrdersList.innerHTML = orders
-    .map(
-      (order) => `
-        <tr>
-          <td><strong>${order.id}</strong></td>
-          <td>
-            <strong>${order.customerName}</strong><br>
-            <small>${order.customerPhone}</small>
-          </td>
-          <td>
-            <span>${order.fulfillment}</span><br>
-            <small>${order.orderDate ? new Date(order.orderDate).toLocaleString("id-ID") : "-"}</small>
-          </td>
-          <td><strong>${rupiah.format(order.total)}</strong></td>
-          <td>
-            <button class="view-proof-btn" data-order-id="${order.id}">Bukti</button>
-            <button class="print-receipt-action-btn" data-print-order-id="${order.id}">Nota</button>
-            <select class="order-status-select" data-order-id="${order.id}">
-              <option value="Pending" ${order.status === "Pending" ? "selected" : ""}>Pending</option>
-              <option value="Paid" ${order.status === "Paid" ? "selected" : ""}>Lunas (Paid)</option>
-              <option value="Completed" ${order.status === "Completed" ? "selected" : ""}>Selesai</option>
-              <option value="Cancelled" ${order.status === "Cancelled" ? "selected" : ""}>Batal</option>
-            </select>
-          </td>
-        </tr>
-      `
-    )
-    .join("");
+  dbGetOrders().then(orders => {
+    if (orders.length === 0) {
+      adminOrdersList.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 24px; color: var(--muted);">Belum ada pesanan masuk.</td></tr>`;
+      return;
+    }
+    
+    adminOrdersList.innerHTML = orders
+      .map(
+        (order) => {
+          const name = order.customer_name || order.customerName || "-";
+          const phone = order.customer_phone || order.customerPhone || "-";
+          const date = order.order_date || order.orderDate;
+          return `
+            <tr>
+              <td><strong>${order.id}</strong></td>
+              <td>
+                <strong>${name}</strong><br>
+                <small>${phone}</small>
+              </td>
+              <td>
+                <span>${order.fulfillment}</span><br>
+                <small>${date ? new Date(date).toLocaleString("id-ID") : "-"}</small>
+              </td>
+              <td><strong>${rupiah.format(order.total)}</strong></td>
+              <td>
+                <button class="view-proof-btn" data-order-id="${order.id}">Bukti</button>
+                <button class="print-receipt-action-btn" data-print-order-id="${order.id}">Nota</button>
+                <select class="order-status-select" data-order-id="${order.id}">
+                  <option value="Pending" ${order.status === "Pending" ? "selected" : ""}>Pending</option>
+                  <option value="Paid" ${order.status === "Paid" ? "selected" : ""}>Lunas (Paid)</option>
+                  <option value="Completed" ${order.status === "Completed" ? "selected" : ""}>Selesai</option>
+                  <option value="Cancelled" ${order.status === "Cancelled" ? "selected" : ""}>Batal</option>
+                </select>
+              </td>
+            </tr>
+          `;
+        }
+      )
+      .join("");
+  });
 }
 
 function handlePromoSave(event) {
@@ -781,6 +813,8 @@ function handlePromoSave(event) {
   const percent = adminPromoPercentInput.value.trim();
   localStorage.setItem("wkcPromoCode", code);
   localStorage.setItem("wkcPromoPercent", percent);
+  dbSetSetting("promoCode", code);
+  dbSetSetting("promoPercent", percent);
   promoSaveStatus.textContent = "Konfigurasi diskon berhasil disimpan!";
   setTimeout(() => { promoSaveStatus.textContent = ""; }, 2500);
   renderCart();
@@ -790,6 +824,7 @@ function handleAnnouncementSave(event) {
   event.preventDefault();
   const text = adminAnnouncementTextarea.value.trim();
   localStorage.setItem("wkcAnnouncement", text);
+  dbSetSetting("announcement", text);
   document.querySelector("#announcement-text").textContent = text;
   newsSaveStatus.textContent = "Banner pengumuman berhasil diupdate!";
   setTimeout(() => { newsSaveStatus.textContent = ""; }, 2500);
@@ -819,15 +854,9 @@ function closeReceiptPopoverModal() {
 }
 
 function handleStatusChange(orderId, newStatus) {
-  const orders = JSON.parse(localStorage.getItem("wkcOrders") || "[]");
-  const updated = orders.map(order => {
-    if (order.id === orderId) {
-      return { ...order, status: newStatus };
-    }
-    return order;
+  dbUpdateOrderStatus(orderId, newStatus).then(() => {
+    renderAdminOrders();
   });
-  localStorage.setItem("wkcOrders", JSON.stringify(updated));
-  renderAdminOrders();
 }
 
 // Product Customizer Modal Controls
@@ -937,7 +966,16 @@ function checkout(event) {
   };
 
   const existingOrders = JSON.parse(localStorage.getItem("wkcOrders") || "[]");
-  localStorage.setItem("wkcOrders", JSON.stringify([order, ...existingOrders].slice(0, 10)));
+  localStorage.setItem("wkcOrders", JSON.stringify([order, ...existingOrders].slice(0, 50)));
+  
+  // Save to Supabase
+  dbSaveOrder(order);
+  
+  // Send Telegram notification
+  sendTelegramNotification(order);
+  
+  // Get reCAPTCHA token (for anti-spam)
+  getRecaptchaToken("checkout");
 
   currentOrder = order;
 
@@ -1067,9 +1105,93 @@ customizerForm.addEventListener("submit", handleCustomizerSubmit);
 document.querySelector("#add-review-form").addEventListener("submit", handleReviewSubmit);
 
 // Run Initializations
+initDatabase();
 initAnnouncement();
 initPromoSettings();
 initReviews();
 renderProducts();
 renderCart();
 updateFulfillmentFields();
+
+// Initialize delivery map when visible
+setTimeout(() => { initDeliveryMap(); }, 1000);
+
+// Cart persistence: load saved cart from localStorage
+const savedCart = localStorage.getItem("wkcCart");
+if (savedCart) {
+  try {
+    cart = JSON.parse(savedCart);
+    renderCart();
+  } catch (e) { /* ignore */ }
+}
+
+// Save cart to localStorage on every change
+const originalRenderCart = renderCart;
+renderCart = function() {
+  originalRenderCart();
+  localStorage.setItem("wkcCart", JSON.stringify(cart));
+};
+
+// Admin Database Settings handlers
+const adminDbForm = document.querySelector("#admin-db-form");
+if (adminDbForm) {
+  adminDbForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const url = document.querySelector("#admin-supabase-url").value.trim();
+    const key = document.querySelector("#admin-supabase-key").value.trim();
+    localStorage.setItem("wkcSupabaseUrl", url);
+    localStorage.setItem("wkcSupabaseKey", key);
+    connectSupabase();
+    const status = document.querySelector("#db-save-status");
+    status.textContent = "Kredensial disimpan. Menghubungkan...";
+    setTimeout(() => { status.textContent = ""; }, 3000);
+  });
+}
+
+const migrateBtn = document.querySelector("#migrate-data-btn");
+if (migrateBtn) {
+  migrateBtn.addEventListener("click", async () => {
+    const status = document.querySelector("#migrate-status");
+    status.textContent = "Sedang migrasi data...";
+    const result = await migrateLocalToCloud();
+    status.textContent = result.message;
+    setTimeout(() => { status.textContent = ""; }, 5000);
+  });
+}
+
+const saveTgBtn = document.querySelector("#save-telegram-btn");
+if (saveTgBtn) {
+  saveTgBtn.addEventListener("click", () => {
+    const token = document.querySelector("#admin-tg-token").value.trim();
+    const chatId = document.querySelector("#admin-tg-chatid").value.trim();
+    localStorage.setItem("wkcTgToken", token);
+    localStorage.setItem("wkcTgChatId", chatId);
+    const status = document.querySelector("#tg-save-status");
+    status.textContent = "Pengaturan Telegram disimpan!";
+    setTimeout(() => { status.textContent = ""; }, 3000);
+  });
+}
+
+const testTgBtn = document.querySelector("#test-telegram-btn");
+if (testTgBtn) {
+  testTgBtn.addEventListener("click", async () => {
+    const status = document.querySelector("#tg-save-status");
+    const testOrder = {
+      id: "TEST-001",
+      customerName: "Test User",
+      customerPhone: "08123456789",
+      fulfillment: "Pick Up (Ambil di Toko)",
+      orderDate: new Date().toISOString(),
+      orderAddress: "",
+      orderNote: "Ini adalah pesan test.",
+      items: [{ name: "Bolen Pisang Keju", qty: 1, price: 55000, customLabel: "" }],
+      subtotal: 55000,
+      discount: 0,
+      total: 55000
+    };
+    status.textContent = "Mengirim test notifikasi...";
+    await sendTelegramNotification(testOrder);
+    status.textContent = "Test notifikasi terkirim! Cek Telegram Anda.";
+    setTimeout(() => { status.textContent = ""; }, 5000);
+  });
+}
