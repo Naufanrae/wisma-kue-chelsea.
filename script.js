@@ -478,6 +478,12 @@ function updateFulfillmentFields() {
   const isDelivery = fulfillment === "delivery";
   deliveryFields.hidden = !isDelivery;
   orderAddress.required = isDelivery;
+  
+  const dateLabel = document.querySelector("#order-date-label");
+  if (dateLabel) {
+    dateLabel.textContent = isDelivery ? "Tanggal & Jam Pengiriman" : "Tanggal & Jam Pengambilan (Pick-up)";
+  }
+  
   if (!isDelivery) {
     orderAddress.value = "";
   }
