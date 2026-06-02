@@ -1137,6 +1137,7 @@ const adminDbForm = document.querySelector("#admin-db-form");
 if (adminDbForm) {
   adminDbForm.addEventListener("submit", (e) => {
     e.preventDefault();
+    e.stopPropagation();
     const url = document.querySelector("#admin-supabase-url").value.trim();
     const key = document.querySelector("#admin-supabase-key").value.trim();
     localStorage.setItem("wkcSupabaseUrl", url);
