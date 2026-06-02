@@ -9,14 +9,15 @@ function initDatabase() {
   const url = localStorage.getItem("wkcSupabaseUrl");
   const key = localStorage.getItem("wkcSupabaseKey");
 
-  // Set defaults on first load
-  if (!url) {
+  // Set defaults on first load or if invalid
+  if (!url || url === "null" || url === "undefined" || url.trim() === "") {
     localStorage.setItem("wkcSupabaseUrl", "https://ohfhabmcdbauacpxwrrq.supabase.co");
     localStorage.setItem("wkcSupabaseKey", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oZmhhYm1jZGJhdWFjcHh3cnJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MTYxMTgsImV4cCI6MjA5NTk5MjExOH0.OtgWpWHprRWsbtlWIeJsHQBoPbCYDQF1xmZzdVHq1FU");
   }
 
-  // Set Telegram defaults
-  if (!localStorage.getItem("wkcTgToken")) {
+  // Set Telegram defaults or if invalid
+  const tgToken = localStorage.getItem("wkcTgToken");
+  if (!tgToken || tgToken === "null" || tgToken === "undefined" || tgToken.trim() === "") {
     localStorage.setItem("wkcTgToken", "8802365798:AAG2O_t22qUyke9ClTYsbWBIsCi9aqXoBIM");
     localStorage.setItem("wkcTgChatId", "6499043028");
   }

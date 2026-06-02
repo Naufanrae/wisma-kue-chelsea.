@@ -20,7 +20,7 @@
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="preload" href="assets/bakery-hero.png" as="image">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=1.0.3">
     <script src="https://www.google.com/recaptcha/api.js?render=6LcucgktAAAAAlvQ71pfRYNFtyF_RjF2IXEuzNmv"></script>
   </head>
   <body>
@@ -465,11 +465,11 @@
                 <form class="admin-setting-form" id="admin-db-form">
                   <label>
                     Supabase Project URL
-                    <input type="url" id="admin-supabase-url" placeholder="https://xxxxx.supabase.co">
+                    <input type="url" id="admin-supabase-url" placeholder="https://xxxxx.supabase.co" value="https://ohfhabmcdbauacpxwrrq.supabase.co">
                   </label>
                   <label>
                     Supabase Anon Key
-                    <input type="text" id="admin-supabase-key" placeholder="eyJhbGciOi...">
+                    <input type="text" id="admin-supabase-key" placeholder="eyJhbGciOi..." value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9oZmhhYm1jZGJhdWFjcHh3cnJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MTYxMTgsImV4cCI6MjA5NTk5MjExOH0.OtgWpWHprRWsbtlWIeJsHQBoPbCYDQF1xmZzdVHq1FU">
                   </label>
                   <button class="admin-action-btn" type="submit">Simpan & Hubungkan</button>
                   <p class="admin-setting-status" id="db-save-status"></p>
@@ -485,11 +485,11 @@
                   <p>Setiap pesanan baru akan mengirim notifikasi ke Telegram.</p>
                   <label>
                     Bot Token
-                    <input type="text" id="admin-tg-token" placeholder="123456:ABC-DEF...">
+                    <input type="text" id="admin-tg-token" placeholder="123456:ABC-DEF..." value="8802365798:AAG2O_t22qUyke9ClTYsbWBIsCi9aqXoBIM">
                   </label>
                   <label>
                     Chat ID
-                    <input type="text" id="admin-tg-chatid" placeholder="123456789">
+                    <input type="text" id="admin-tg-chatid" placeholder="123456789" value="6499043028">
                   </label>
                   <button class="admin-action-btn" id="save-telegram-btn" type="button">Simpan Telegram</button>
                   <button class="admin-action-btn secondary" id="test-telegram-btn" type="button">Test Kirim Notif</button>
@@ -631,7 +631,7 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="db.js"></script>
-    <script src="script.js"></script>
+    <script src="db.js?v=1.0.3"></script>
+    <script src="script.js?v=1.0.3"></script>
   </body>
 </html>
