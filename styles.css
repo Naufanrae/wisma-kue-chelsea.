@@ -2106,14 +2106,20 @@ h3 {
 
 .star-rating-input label {
   color: #ccc;
+  display: inline;
   cursor: pointer;
   padding: 0 2px;
   transition: color 0.2s ease;
 }
 
-.star-rating-input label:hover,
-.star-rating-input label:hover ~ label,
-.star-rating-input input:checked ~ label {
+#add-review-form .star-rating-input label {
+  color: #ccc;
+  display: inline;
+}
+
+#add-review-form .star-rating-input label:hover,
+#add-review-form .star-rating-input label:hover ~ label,
+#add-review-form .star-rating-input input:checked ~ label {
   color: var(--gold);
 }
 
